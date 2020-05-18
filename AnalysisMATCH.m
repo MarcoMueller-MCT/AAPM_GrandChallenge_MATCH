@@ -14,6 +14,8 @@ will change the start and end points of the selected trace section.
 
 %}
 
+% This line is a test change made to check commitment of changes/Per Poulsen
+
 %%
 clear all
 %close all
