@@ -237,8 +237,8 @@ ylim([min([min(min(GT_Trace)),min(min(Markerless_Trace))]),max([max(max(GT_Trace
 annotation('textbox', [0.741, 0.175, 0.1, 0.025], 'string', ['ME: ' num2str(round(ME(3),1)) ' +- ' num2str(round(STD(3),1)),' mm'],'FontSize',14,'Backgroundcolor','white','FitBoxToText','on', 'Color','red','FaceAlpha',.9 );
 
 mkdir('Results\');
-print(['Results\',Participant,'_', tracefile(1:end-4)],'-dpng');
-savefig(['Results\',Participant,'_', tracefile(1:end-4),'.fig']);
+print(['Results\',Participant,'_', tracefile.file(1:end-4)],'-dpng');
+savefig(['Results\',Participant,'_', tracefile.file(1:end-4),'.fig']);
 
 Analysis.PercentWith1mm = length(find(vecnorm(TrackingError')<=1))/length(TrackingError);
 Analysis.PercentWith2mm = length(find(vecnorm(TrackingError')<=2))/length(TrackingError);
