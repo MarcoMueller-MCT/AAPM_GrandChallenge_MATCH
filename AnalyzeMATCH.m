@@ -2,8 +2,13 @@ function []=AnalyzeMATCH()
 
 %{
 
-This script is used to quickly analyse participant submissions for MATCH
+This script is used to quickly analyze participant submissions for MATCH
 by displaying the ground truth HexaMotion trace with the Markerless tracking trace.
+
+Optimization of the sampling rate has been included after it was found that the HexaMotion 
+platform drives different motion traces with different speeds. The user has to enter an initial 
+sampling rate and the optimizer tries to find a better fit withing +- 5% of that sampling rate 
+by maximizing the correlation of the resampled measured motion with the ground truth motion trace. 
 
 Instructions:
 1. Save the tracked target location as distance from isocenter in mm
@@ -15,7 +20,6 @@ to manually align the ground truth. Do not use the zoom function, as this
 will change the start and end points of the selected trace section.
 
 %}
-
 %%
 clear all
 %close all
