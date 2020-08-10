@@ -12,6 +12,8 @@ tracked target location trace. Use the "Pan"-tool (Hand-symbol) on the upper plo
 to manually align the ground truth. Do not use the zoom function, as this
 will change the start and end points of the selected trace section.
 
+The sampling rate will not be optimized, but stay fixed on the number the user specifies.
+
 %}
 
 % This line is a test change made to check commitment of changes/Per Poulsen
