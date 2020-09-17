@@ -73,7 +73,8 @@ for ii=1:length(SamplingRange)
     if size(GTSignal,1) > length(MarkerlessFile.SI_mm)
         for I = 1:size(GTSignalRes,1)-length(MarkerlessFile.SI_mm)
             GTSignalResTemp = GTSignalRes(I:I+length(MarkerlessFile.SI_mm)-1,:);
-            GT_MT_Dist(I) = sum(diag(corr([MarkerlessFile.LR_mm,MarkerlessFile.SI_mm,[MarkerlessFile.AP_mm]],GTSignalResTemp)));
+            MarkerlessResTemp = [MarkerlessFile.LR_mm,MarkerlessFile.SI_mm,MarkerlessFile.AP_mm];
+            GT_MT_Dist(I) = sum(diag(corr(MarkerlessResTemp(~isnan(MarkerlessResTemp)),GTSignalResTemp(~isnan(MarkerlessResTemp)))));
         end
         [CorrelationScore(ii),~] = max(GT_MT_Dist);
     else
@@ -84,7 +85,7 @@ for ii=1:length(SamplingRange)
             MarkerlessResTemp(:,1) = MarkerlessFile.LR_mm(1:length(GTSignal)-I,:);
             MarkerlessResTemp(:,2) = MarkerlessFile.SI_mm(1:length(GTSignal)-I,:);
             MarkerlessResTemp(:,3) = MarkerlessFile.AP_mm(1:length(GTSignal)-I,:);
-            GT_MT_Dist_1(I) = sum(diag(corr(MarkerlessResTemp,GTSignalResTemp)));
+            GT_MT_Dist_1(I) = sum(diag(corr(MarkerlessResTemp(~isnan(MarkerlessResTemp)),GTSignalResTemp(~isnan(MarkerlessResTemp)))));
         end
         [CorrelationScore(ii),x] = max(GT_MT_Dist_1);
         GT_Trace = GTSignal;
@@ -111,9 +112,11 @@ end
 if size(GTSignal,1) > length(MarkerlessFile.SI_mm)
     for I = 1:size(GTSignalRes,1)-length(MarkerlessFile.SI_mm)
         GTSignalResTemp = GTSignalRes(I:I+length(MarkerlessFile.SI_mm)-1,:);
-        GT_MT_Dist(I) = sum(diag(corr([MarkerlessFile.LR_mm,MarkerlessFile.SI_mm,[MarkerlessFile.AP_mm]],GTSignalResTemp)));
+        MarkerlessResTemp = [MarkerlessFile.LR_mm,MarkerlessFile.SI_mm,MarkerlessFile.AP_mm];
+        GT_MT_Dist(I) = sum(diag(corr(MarkerlessResTemp(~isnan(MarkerlessResTemp)),GTSignalResTemp(~isnan(MarkerlessResTemp)))));
     end
     [~,x] = max(GT_MT_Dist);
+    GT_Trace = GTSignal;
 else
     deleteddatapoints = [];
     for I = 1:0.8*size(GTSignal,1)
@@ -134,7 +137,7 @@ else
             MarkerlessResTemp(:,1) = MarkerlessFile.LR_mm(I:I+length(GTSignal)-1,:);
             MarkerlessResTemp(:,2) = MarkerlessFile.SI_mm(I:I+length(GTSignal)-1,:);
             MarkerlessResTemp(:,3) = MarkerlessFile.AP_mm(I:I+length(GTSignal)-1,:);
-            GT_MT_Dist(I) = sum(diag(corr(MarkerlessResTemp,GTSignal)));
+            GT_MT_Dist(I) = sum(diag(corr(MarkerlessResTemp(~isnan(MarkerlessResTemp)),GTSignal(~isnan(MarkerlessResTemp)))));
         end
         [~,x1] = max(GT_MT_Dist);
         GT_Trace(x1+x:x1+x+length(GTSignal)-1,:) = GTSignal;
@@ -151,7 +154,7 @@ else
             MarkerlessResTemp(:,1) = MarkerlessFile.LR_mm(I:end,:);
             MarkerlessResTemp(:,2) = MarkerlessFile.SI_mm(I:end,:);
             MarkerlessResTemp(:,3) = MarkerlessFile.AP_mm(I:end,:);
-            GT_MT_Dist(I) = sum(diag(corr(MarkerlessResTemp,GTSignalResTemp)));
+            GT_MT_Dist(I) = sum(diag(corr(MarkerlessResTemp(~isnan(MarkerlessResTemp)),GTSignalResTemp(~isnan(MarkerlessResTemp)))));
         end
         [~,x1] = max(GT_MT_Dist);
         deleteddatapoints = [deleteddatapoints, periodstart:x1];
@@ -160,8 +163,13 @@ else
 end
 
 Tracefig = figure('units','normalized','outerposition',[0 0 1 1]);
-subplot(2,1,1); plot(GT_Trace,'LineWidth',2); title('HexaMotion Trace','FontSize',16); legend('LR','SI','AP','Deleted data'); hold on; plot(deleteddatapoints+x,GT_Trace(deleteddatapoints+x),'ro','LineWidth',2); xlim([x,x+length(MarkerlessFile.LR_mm)]); ylim([min(min(GTSignalRes)),max(max(GTSignalRes))]);
-subplot(2,1,2); plot(MarkerlessFile.LR_mm,'LineWidth',2);hold on; plot(MarkerlessFile.SI_mm,'LineWidth',2); hold on; plot(MarkerlessFile.AP_mm,'LineWidth',2);hold on; plot(deleteddatapoints,MarkerlessFile.SI_mm(deleteddatapoints),'ro','LineWidth',2);plot(deleteddatapoints,MarkerlessFile.AP_mm(deleteddatapoints),'ro','LineWidth',2);plot(deleteddatapoints,MarkerlessFile.LR_mm(deleteddatapoints),'ro','LineWidth',2); title('Markerless Tracking Trace','FontSize',16); legend('LR','SI','AP','Deleted data');xlim([1,1+length(MarkerlessFile.LR_mm)]); ylim([min(min(GTSignalRes)),max(max(GTSignalRes))])
+if size(GTSignal,1) > length(MarkerlessFile.SI_mm)
+    subplot(2,1,1); plot(GTSignalRes,'LineWidth',2); title('HexaMotion Trace','FontSize',16); legend('LR','SI','AP'); xlim([x,x+length(MarkerlessFile.LR_mm)]); %ylim([min(min(GTSignalRes)),max(max(GTSignalRes))])
+    subplot(2,1,2); plot(MarkerlessFile.LR_mm,'LineWidth',2);hold on; plot(MarkerlessFile.SI_mm,'LineWidth',2); hold on; plot(MarkerlessFile.AP_mm,'LineWidth',2);title('Markerless Tracking Trace','FontSize',16); legend('LR','SI','AP');xlim([1,1+length(MarkerlessFile.LR_mm)]); ylim([min(min(GTSignalRes)),max(max(GTSignalRes))])
+else
+    subplot(2,1,1); plot(GT_Trace,'LineWidth',2); title('HexaMotion Trace','FontSize',16); legend('LR','SI','AP','Deleted data'); hold on; plot(deleteddatapoints+x,GT_Trace(deleteddatapoints+x),'ro','LineWidth',2); xlim([x,x+length(MarkerlessFile.LR_mm)]); ylim([min(min(GTSignalRes)),max(max(GTSignalRes))]);
+    subplot(2,1,2); plot(MarkerlessFile.LR_mm,'LineWidth',2);hold on; plot(MarkerlessFile.SI_mm,'LineWidth',2); hold on; plot(MarkerlessFile.AP_mm,'LineWidth',2);hold on; plot(deleteddatapoints,MarkerlessFile.SI_mm(deleteddatapoints),'ro','LineWidth',2);plot(deleteddatapoints,MarkerlessFile.AP_mm(deleteddatapoints),'ro','LineWidth',2);plot(deleteddatapoints,MarkerlessFile.LR_mm(deleteddatapoints),'ro','LineWidth',2); title('Markerless Tracking Trace','FontSize',16); legend('LR','SI','AP','Deleted data');xlim([1,1+length(MarkerlessFile.LR_mm)]); ylim([min(min(GTSignalRes)),max(max(GTSignalRes))])
+end
 
 pause(2.0);
 f = figure;
@@ -193,21 +201,30 @@ end
 %%motion platform may follow some unknown motion at the transition from the
 %%end of one trace to the beginning of the next. These data points were
 %%identified during the correlation with the ground truth and deleted:
+if size(GTSignal,1) < length(MarkerlessFile.SI_mm)
 Markerless_Trace(deleteddatapoints,:)=[];
 GT_Trace(deleteddatapoints,:)=[];
-
+end
 %%
-TrackingError =  Markerless_Trace- GT_Trace;
+
+n=1;
+for i=1:length(Markerless_Trace)
+    if ~isnan(Markerless_Trace(i,1)) && ~isnan(Markerless_Trace(i,2)) && ~isnan(Markerless_Trace(i,3))
+        TrackingError(n,:) =  Markerless_Trace(i,:)- GT_Trace(i,:);
+        n=n+1;
+    end
+end
 
 ME = mean(TrackingError);
 STD = std(TrackingError);
+idx = find(~isnan(Markerless_Trace(:,1)));
 
 xAxisTimeLabel= [(1:size(GT_Trace(:,1)))/50];
 
 figure('units','normalized','outerposition',[0 0.25 1 0.6]);
 subplot(1,3,1);
 plot(xAxisTimeLabel,GT_Trace(:,1)-mean(GT_Trace(:,1)),'LineWidth',1.5,'Color','black');
-hold on; plot(xAxisTimeLabel,Markerless_Trace(:,1)-mean(GT_Trace(:,1)),'LineWidth',1.5);
+hold on; plot(xAxisTimeLabel(idx),Markerless_Trace(idx,1)-mean(GT_Trace(:,1)),'LineWidth',1.5);
 legend('Ground truth','Tracking');
 %axis([-inf inf min(Result.PhantomMotionTrace.GroundTruth(:,1))-0.2*(max(Result.PhantomMotionTrace.GroundTruth(:,1))-min(Result.PhantomMotionTrace.GroundTruth(:,1))) inf])
 title('LR direction','FontSize',16);
@@ -218,7 +235,7 @@ annotation('textbox', [0.18, 0.175, 0.1, 0.025], 'string', ['ME: ' num2str(round
 
 subplot(1,3,2);
 plot(xAxisTimeLabel,GT_Trace(:,2)-mean(GT_Trace(:,2)),'LineWidth',1.5,'Color','black');
-hold on; plot(xAxisTimeLabel,Markerless_Trace(:,2)-mean(GT_Trace(:,2)),'LineWidth',1.5);
+hold on; plot(xAxisTimeLabel(idx),Markerless_Trace(idx,2)-mean(GT_Trace(:,2)),'LineWidth',1.5);
 legend('Ground truth','Tracking');
 %axis([-inf inf min(Result.PhantomMotionTrace.GroundTruth(:,2))-0.2*(max(Result.PhantomMotionTrace.GroundTruth(:,2))-min(Result.PhantomMotionTrace.GroundTruth(:,2))) inf])
 title('SI direction','FontSize',16);
@@ -228,7 +245,7 @@ annotation('textbox', [0.46, 0.175, 0.1, 0.025], 'string', ['ME: ' num2str(round
 
 subplot(1,3,3);
 plot(xAxisTimeLabel,GT_Trace(:,3)-mean(GT_Trace(:,3)),'LineWidth',1.5,'Color','black');
-hold on; plot(xAxisTimeLabel,Markerless_Trace(:,3)-mean(GT_Trace(:,3)),'LineWidth',1.5);
+hold on; plot(xAxisTimeLabel(idx),Markerless_Trace(idx,3)-mean(GT_Trace(:,3)),'LineWidth',1.5);
 legend('Ground truth','Tracking');
 %axis([-inf inf min(Result.PhantomMotionTrace.GroundTruth(:,3))-0.2*(max(Result.PhantomMotionTrace.GroundTruth(:,3))-min(Result.PhantomMotionTrace.GroundTruth(:,3))) inf])
 title('AP direction','FontSize',16);
@@ -250,7 +267,7 @@ Analysis.MeanErrorSTD = STD;
 Analysis.AUC = sort(vecnorm(TrackingError'))';
 Analysis.Percentile95th = Analysis.AUC(round(0.95*length(TrackingError)));
 
-save(['Results\',Participant,'_', tracefile(1:end-4),'.mat'],'Markerless_Trace','GT_Trace','Analysis')
+save(['Results\',Participant,'_', tracefile.file(1:end-4),'.mat'],'Markerless_Trace','GT_Trace','Analysis')
 
 
 end
