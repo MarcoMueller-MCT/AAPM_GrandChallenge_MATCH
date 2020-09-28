@@ -147,10 +147,16 @@ else
     end
     if periodstart + size(GTSignal,1) +300 > length(MarkerlessFile.LR_mm)
         clear GT_MT_Dist
-        for I = periodstart:periodstart +300
+        %diffcutoff = (length(MarkerlessFile.LR_mm)-periodstart - size(GTSignal,1)+1);
+        for I = periodstart:periodstart + 300
             clear MarkerlessResTemp GTSignalResTemp
             Limit = length(MarkerlessFile.LR_mm)-I;
-            GTSignalResTemp = GTSignal(1:Limit+1,:);
+            if Limit+1 > size(GTSignal,1)
+                GTSignalResTemp = [GTSignal;GTSignal];
+                GTSignalResTemp = GTSignalResTemp(1:Limit+1,:);
+            else
+                GTSignalResTemp = GTSignal(1:Limit+1,:);
+            end
             MarkerlessResTemp(:,1) = MarkerlessFile.LR_mm(I:end,:);
             MarkerlessResTemp(:,2) = MarkerlessFile.SI_mm(I:end,:);
             MarkerlessResTemp(:,3) = MarkerlessFile.AP_mm(I:end,:);

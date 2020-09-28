@@ -125,7 +125,7 @@ else
         MarkerlessResTemp(:,1) = MarkerlessFile.LR_mm(1:length(GTSignal)-I,:);
         MarkerlessResTemp(:,2) = MarkerlessFile.SI_mm(1:length(GTSignal)-I,:);
         MarkerlessResTemp(:,3) = MarkerlessFile.AP_mm(1:length(GTSignal)-I,:);
-        GT_MT_Dist_1(I) = sum(diag(corr(MarkerlessResTemp,GTSignalResTemp)));
+        GT_MT_Dist_1(I) = sum(diag(corr(MarkerlessResTemp(~isnan(MarkerlessResTemp)),GTSignalResTemp(~isnan(MarkerlessResTemp)))));
     end
     [~,x] = max(GT_MT_Dist_1);
     GT_Trace = GTSignal;
@@ -147,10 +147,16 @@ else
     end
     if periodstart + size(GTSignal,1) +300 > length(MarkerlessFile.LR_mm)
         clear GT_MT_Dist
-        for I = periodstart:periodstart +300
+        %diffcutoff = (length(MarkerlessFile.LR_mm)-periodstart - size(GTSignal,1)+1);
+        for I = periodstart:periodstart + 300
             clear MarkerlessResTemp GTSignalResTemp
             Limit = length(MarkerlessFile.LR_mm)-I;
-            GTSignalResTemp = GTSignal(1:Limit+1,:);
+            if Limit+1 > size(GTSignal,1)
+                GTSignalResTemp = [GTSignal;GTSignal];
+                GTSignalResTemp = GTSignalResTemp(1:Limit+1,:);
+            else
+                GTSignalResTemp = GTSignal(1:Limit+1,:);
+            end
             MarkerlessResTemp(:,1) = MarkerlessFile.LR_mm(I:end,:);
             MarkerlessResTemp(:,2) = MarkerlessFile.SI_mm(I:end,:);
             MarkerlessResTemp(:,3) = MarkerlessFile.AP_mm(I:end,:);
@@ -192,7 +198,10 @@ if latency ~=0
     NewHexaTracelim = ceil(HexaTracelim/p*q) + ceil(latency*q/1000);
     GT_Trace = GT_Trace(NewHexaTracelim(1):NewHexaTracelim(2),:);
     GT_Trace(length(Markerless_Trace)+1:end,:)=[];
+elseif size(GT_Trace,1) > (HexaTracelim(2)-1)-HexaTracelim(1)
+    GT_Trace = GT_Trace(HexaTracelim(1):HexaTracelim(2)-1,:);
 else
+    GT_Trace = [GT_Trace;GT_Trace];
     GT_Trace = GT_Trace(HexaTracelim(1):HexaTracelim(2)-1,:);
 end
 
