@@ -27,7 +27,7 @@ clear all
 prompt = {'Participant name:','System latency [ms]:','Tracking sampling rate [Hz]:'};
 dlgtitle = 'Input';
 dims = [1 55];
-definput = {'Test_Participant','0','95'};
+definput = {'RNSH','0','7'};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 
 Participant = answer{1};
@@ -277,6 +277,5 @@ Analysis.AUC = sort(vecnorm(TrackingError'))';
 Analysis.Percentile95th = Analysis.AUC(round(0.95*length(TrackingError)));
 
 save(['Results\',Participant,'_', tracefile.file(1:end-4),'.mat'],'Markerless_Trace','GT_Trace','Analysis')
-
 
 end
