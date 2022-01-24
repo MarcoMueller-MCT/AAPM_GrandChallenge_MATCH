@@ -11,11 +11,15 @@ function output = PrepareMATCHExperimentalData(output)
 
 if 1
     
-    traceName{1} = 'Sinusoidal';
+    traceName{1} = 'BaselineShift';
+    traceName{2} = 'HighFreq';
+    traceName{3} = 'LRDominant';
+    traceName{4} = 'Sinusoidal';
+    traceName{5} = 'TypicalLung';
     
     
-    for planNo = 1
-        for traceNo = 1
+    for planNo = 1:2
+        for traceNo = 1:5
             dataFile = ['ExampleData\MATCHResultsSubmission_Plan' num2str(planNo) '_' traceName{traceNo} '.xlsx'];
             
             data = readmatrix(dataFile);
@@ -31,8 +35,10 @@ if 1
             trackingResult(trackingResult==0)=nan;
             figure(10* planNo + traceNo)
             plot(trackingResult)
+            
+             
                
-            outputFile = ['ExampleData\Example_Plan' num2str(planNo) '_' traceName{traceNo} '.mat'];
+            outputFile = ['A:\MCT\MAGIK_Development\MATCH\Result analysis\RNSH\Motion tracking results\New\RNSH_Plan' num2str(planNo) '_' traceName{traceNo} '.mat'];
             
             save(outputFile,'trackingResult')
         end

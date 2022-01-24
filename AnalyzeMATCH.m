@@ -27,14 +27,14 @@ clear all
 prompt = {'Participant name:','System latency [ms]:','Tracking sampling rate [Hz]:'};
 dlgtitle = 'Input';
 dims = [1 55];
-definput = {'RNSH','0','7'};
+definput = {'Conv Linac 5','0','7'};
 answer = inputdlg(prompt,dlgtitle,dims,definput);
 
 Participant = answer{1};
 latency = str2double(answer{2}); % latency in ms
 Sampling = str2double(answer{3}); % Sampling rate of the tracked target location in Hz
-
-TrackingResult = cell2mat(struct2cell(load(uigetfile('','Please select tracking result file'))));
+[TRfile, TRFileFolder] = uigetfile('','Please select tracking result file');
+TrackingResult = cell2mat(struct2cell(load([TRFileFolder,TRfile])));
 
 MarkerlessFile.LR_mm = TrackingResult(:,1);
 MarkerlessFile.SI_mm = TrackingResult(:,2);
